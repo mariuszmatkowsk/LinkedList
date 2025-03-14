@@ -47,7 +47,7 @@ TEST(LinkedList, memoryShouldBeFreeOnce) {
 
     unsigned destruction_count{};
     {
-        LinkedList<Foo> ll{Foo{&destruction_count}};
+        LinkedList<Foo> ll(Foo{&destruction_count});
     }
 
     EXPECT_EQ(destruction_count, 1);
@@ -139,5 +139,42 @@ TEST(LinkedList, pushBack) {
     EXPECT_EQ(ll.front(), 3);
     ll.pop_front();
     EXPECT_EQ(ll.front(), 4);
+}
+
+TEST(LinkedList, initializeWithManyElements) {
+    LinkedList ll{3, 45, 33, 77};
+
+    EXPECT_FALSE(ll.is_empty());
+
+    EXPECT_EQ(ll.front(), 3);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 45);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 33);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 77);
+}
+
+TEST(LinkedList, canCompareTwoLinkedLists_Equal) {
+    LinkedList<int> ll{2, 3};
+    LinkedList<int> lll{2, 3};
+
+    EXPECT_EQ(ll, lll);
+
+    LinkedList<int> l1{};
+    LinkedList<int> l2{};
+
+    EXPECT_EQ(l1, l2);
+}
+
+TEST(LinkedList, canCompareTwoLinkedLists_NotEqual) {
+    LinkedList<int> l{};
+    LinkedList<int> ll{2, 3, 4};
+    LinkedList<int> lll{2, 3};
+    LinkedList<int> llll{2, 4, 3};
+ 
+    EXPECT_NE(l, ll);
+    EXPECT_NE(ll, lll);
+    EXPECT_NE(ll, llll);
 }
 

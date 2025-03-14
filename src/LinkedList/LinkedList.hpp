@@ -27,6 +27,12 @@ public:
         : root_{new Node{std::move(data)}}
     {}
 
+    explicit LinkedList(std::initializer_list<T> elements) : root_{nullptr} {
+        for (const auto& ele : elements) {
+            push_back(ele);
+        }
+    }
+
     LinkedList(const LinkedList&) = default;
     LinkedList& operator=(const LinkedList&) = default;
 
@@ -34,8 +40,6 @@ public:
     LinkedList& operator=(LinkedList&&) noexcept = default;
 
     ~LinkedList() {
-        if (!root_) return;
-
         auto current = root_;
         while (current) {
             const auto next = current->next;
@@ -123,6 +127,21 @@ public:
         }
         delete current;
         prev->next = nullptr;
+    }
+
+    friend bool operator==(const LinkedList& lhs, const LinkedList& rhs) {
+        auto left = lhs.root_;
+        auto right = rhs.root_;
+
+        while (left && right) {
+            if (left->data != right->data) {
+                return false;
+            }
+
+            left = left->next;
+            right = right->next;
+        }
+        return left == right;
     }
 };
 

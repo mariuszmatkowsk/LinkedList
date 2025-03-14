@@ -27,7 +27,7 @@ int main() {
     unsigned count{0};
     Foo foo{&count};
     {
-        LinkedList<Foo> ll{std::move(foo)};
+        LinkedList<Foo> ll(std::move(foo));
         std::println("Linked list destoryed...");
     }
 
