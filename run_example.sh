@@ -1,3 +1,3 @@
 #! /usr/bin/env bash
 
-./build/examples/example
+./make_build.sh && ./build/examples/example
