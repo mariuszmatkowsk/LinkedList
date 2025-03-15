@@ -8,19 +8,45 @@ struct Node {
     Node* next{};
 
     explicit Node(T data, Node* next = nullptr)
-        : data{std::move(data)}, next{std::move(next)}
+        : data{std::move(data)}, next{next}
     {}
 };
 
 template <typename T>
-class LinkedList {
-    using ElementType = T;
-    using ElementTypeRef = T&;
-    using ElementTypeConstRef = const T&;
+class LinkedListIterator {
+    using NodeType = std::conditional_t<
+        std::is_const_v<T>, const Node<std::remove_const_t<T>>, Node<T>>;
 
+    NodeType* current_;
+
+public:
+    explicit LinkedListIterator(NodeType* current) : current_(current) {}
+
+    T& operator*() const { return current_->data; };
+    T* operator->() const { return &current_->data; };
+
+    LinkedListIterator& operator++() {
+        current_ = current_->next;
+        return *this;
+    }
+
+    friend auto operator!=(const LinkedListIterator& lhs, const LinkedListIterator& rhs) {
+        return lhs.current_ != rhs.current_;
+    }
+};
+
+template <typename T>
+class LinkedList {
     Node<T>* root_{};
 
 public:
+    using value_type = T;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+
+    using iterator = LinkedListIterator<T>;
+    using const_iterator = LinkedListIterator<const T>;
+
     LinkedList() : root_{nullptr} {}
 
     explicit LinkedList(T data)
@@ -50,22 +76,34 @@ public:
     }
 
     [[nodiscard]]
+    auto begin() { return iterator{root_}; };
+
+    [[nodiscard]]
+    auto end() { return iterator{nullptr}; };
+
+    [[nodiscard]]
+    auto begin() const { return const_iterator{root_}; };
+
+    [[nodiscard]]
+    auto end() const { return const_iterator{nullptr}; };
+
+    [[nodiscard]]
     bool is_empty() const {
         return root_ == nullptr;
     }
 
     [[nodiscard]]
-    ElementTypeRef front() {
+    reference front() {
         return root_->data;
     }
 
     [[nodiscard]]
-    ElementTypeConstRef front() const {
+    const_reference front() const {
         return root_->data;
     }
 
     [[nodiscard]]
-    ElementTypeRef back() {
+    reference back() {
         auto current = root_;
         while (current->next) {
             current = current->next;
@@ -74,7 +112,7 @@ public:
     }
 
     [[nodiscard]]
-    ElementTypeConstRef back() const {
+    const_reference back() const {
         auto current = root_;
         while (current->next) {
             current = current->next;
@@ -82,7 +120,7 @@ public:
         return current->data;
     }
 
-    void push_front(T data) {
+    void push_front(value_type data) {
         const auto next = root_;
         root_ = new Node{std::move(data), next};
     }
@@ -95,7 +133,7 @@ public:
         root_ = next;
     }
 
-    void push_back(T data) {
+    void push_back(value_type data) {
         const auto new_node = new Node{std::move(data)};
 
         if (!root_) {
@@ -129,7 +167,7 @@ public:
         prev->next = nullptr;
     }
 
-    friend bool operator==(const LinkedList& lhs, const LinkedList& rhs) {
+    friend auto operator==(const LinkedList& lhs, const LinkedList& rhs) {
         auto left = lhs.root_;
         auto right = rhs.root_;
 

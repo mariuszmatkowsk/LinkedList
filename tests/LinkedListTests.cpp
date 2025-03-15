@@ -178,3 +178,27 @@ TEST(LinkedList, canCompareTwoLinkedLists_NotEqual) {
     EXPECT_NE(ll, llll);
 }
 
+TEST(LinkedList, canUseWithRangeBasedLoop) {
+    LinkedList ll{2, 3, 4};
+
+    std::array<int, 3> expected{2, 3, 4};
+
+    for (size_t i{}; const auto& ll_element : ll) {
+        EXPECT_EQ(ll_element, expected[i++]);
+    }
+}
+
+TEST(LinkedList, canModifyElementBytRangeBasedLoop) {
+    LinkedList ll{1, 2, 3};
+
+    for (auto& elem : ll) {
+        elem = 4;
+    }
+
+    EXPECT_EQ(ll.front(), 4);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 4);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 4);
+}
+
