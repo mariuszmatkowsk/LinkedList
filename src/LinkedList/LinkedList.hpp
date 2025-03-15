@@ -22,7 +22,7 @@ class LinkedListIterator {
 public:
     explicit LinkedListIterator(NodeType* current) : current_(current) {}
 
-    T& operator*() const { return current_->data; };
+    T& operator*()  const { return  current_->data; };
     T* operator->() const { return &current_->data; };
 
     LinkedListIterator& operator++() {
@@ -30,7 +30,8 @@ public:
         return *this;
     }
 
-    friend auto operator!=(const LinkedListIterator& lhs, const LinkedListIterator& rhs) {
+    friend auto operator!=(
+            const LinkedListIterator& lhs, const LinkedListIterator& rhs) {
         return lhs.current_ != rhs.current_;
     }
 };
@@ -40,12 +41,12 @@ class LinkedList {
     Node<T>* root_{};
 
 public:
-    using value_type = T;
-    using reference = value_type&;
+    using value_type      = T;
+    using reference       = value_type&;
     using const_reference = const value_type&;
 
-    using iterator = LinkedListIterator<T>;
-    using const_iterator = LinkedListIterator<const T>;
+    using iterator        = LinkedListIterator<T>;
+    using const_iterator  = LinkedListIterator<const T>;
 
     LinkedList() : root_{nullptr} {}
 
@@ -59,10 +60,10 @@ public:
         }
     }
 
-    LinkedList(const LinkedList&) = default;
-    LinkedList& operator=(const LinkedList&) = default;
+    LinkedList(const LinkedList&)                = default;
+    LinkedList& operator=(const LinkedList&)     = default;
 
-    LinkedList(LinkedList&&) noexcept = default;
+    LinkedList(LinkedList&&)            noexcept = default;
     LinkedList& operator=(LinkedList&&) noexcept = default;
 
     ~LinkedList() {

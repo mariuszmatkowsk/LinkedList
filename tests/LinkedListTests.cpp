@@ -29,13 +29,17 @@ TEST(LinkedList, memoryShouldBeFreeOnce) {
         unsigned* destruction_count_;
 
     public:
-        explicit Foo(unsigned* destruction_count) : destruction_count_{destruction_count} {}
+        explicit Foo(unsigned* destruction_count)
+            : destruction_count_{destruction_count}
+        {}
 
-        Foo(const Foo&) = delete;
+        Foo(const Foo&)            = delete;
         Foo& operator=(const Foo&) = delete;
 
         Foo(Foo&& other) noexcept
-            : destruction_count_{std::exchange(other.destruction_count_, nullptr)} {}
+            : destruction_count_{
+                std::exchange(other.destruction_count_, nullptr)}
+        {}
 
         Foo& operator=(Foo&&) noexcept = delete;
 
