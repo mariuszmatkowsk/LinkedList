@@ -218,3 +218,21 @@ TEST(LinkedList, canModifyElementBytRangeBasedLoop) {
     EXPECT_EQ(ll.front(), 4);
 }
 
+TEST(LinkedList, canInitializeLinkedListFromAnother) {
+    LinkedList<int> ll{1, 2, 3};
+
+    LinkedList<int> lll = ll;
+
+    EXPECT_EQ(ll.front(), 1);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 2);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 3);
+
+    EXPECT_EQ(lll.front(), 1);
+    lll.pop_front();
+    EXPECT_EQ(lll.front(), 2);
+    lll.pop_front();
+    EXPECT_EQ(lll.front(), 3);
+}
+

@@ -72,7 +72,14 @@ public:
         }
     }
 
-    LinkedList(const LinkedList&)                = default;
+    LinkedList(const LinkedList& other) : root_{nullptr} {
+        if (!other.root_) return;
+
+        for (const auto& e : other) {
+            push_back(e);
+        }
+    }
+
     LinkedList& operator=(const LinkedList&)     = default;
 
     LinkedList(LinkedList&&)            noexcept = default;
