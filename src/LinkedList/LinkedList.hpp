@@ -67,8 +67,14 @@ public:
     {}
 
     explicit LinkedList(std::initializer_list<T> elements) : root_{nullptr} {
-        for (const auto& ele : elements) {
-            push_back(ele);
+        if (elements.size() == 0) return;
+
+        root_ = new Node{*elements.begin()};
+
+        auto current = root_;
+        for (auto it = elements.begin() + 1; it != elements.end(); ++it) {
+            current->next = new Node{*it};
+            current = current->next;
         }
     }
 
