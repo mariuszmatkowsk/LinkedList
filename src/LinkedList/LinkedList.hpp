@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <utility>
 
 template <typename T>
@@ -20,6 +21,12 @@ class LinkedListIterator {
     NodeType* current_;
 
 public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type        = NodeType;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = NodeType*;
+    using reference         = NodeType&&;
+
     explicit LinkedListIterator(NodeType* current) : current_(current) {}
 
     T& operator*()  const { return  current_->data; };
@@ -28,6 +35,11 @@ public:
     LinkedListIterator& operator++() {
         current_ = current_->next;
         return *this;
+    }
+
+    friend auto operator==(
+            const LinkedListIterator& lhs, const LinkedListIterator& rhs) {
+        return lhs.current_ == rhs.current_;
     }
 
     friend auto operator!=(
@@ -169,18 +181,7 @@ public:
     }
 
     friend auto operator==(const LinkedList& lhs, const LinkedList& rhs) {
-        auto left = lhs.root_;
-        auto right = rhs.root_;
-
-        while (left && right) {
-            if (left->data != right->data) {
-                return false;
-            }
-
-            left = left->next;
-            right = right->next;
-        }
-        return left == right;
+        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 };
 

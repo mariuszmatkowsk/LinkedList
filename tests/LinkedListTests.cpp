@@ -182,6 +182,18 @@ TEST(LinkedList, canCompareTwoLinkedLists_NotEqual) {
     EXPECT_NE(ll, llll);
 }
 
+TEST(LinkedList, begin) {
+    LinkedList ll{2};
+
+    EXPECT_EQ(*ll.begin(), 2);
+}
+
+TEST(LinkedList, emptyListBeginEqualEnd) {
+    LinkedList<int> ll{};
+
+    EXPECT_EQ(ll.begin(), ll.end());
+}
+
 TEST(LinkedList, canUseWithRangeBasedLoop) {
     LinkedList ll{2, 3, 4};
 
