@@ -236,3 +236,27 @@ TEST(LinkedList, canInitializeLinkedListFromAnother) {
     EXPECT_EQ(lll.front(), 3);
 }
 
+TEST(LinkedList, copyAssignemtnOperatorDoNothingWhenSelfAssignment) {
+    LinkedList ll{1, 2};
+
+    ll = ll;
+
+    EXPECT_EQ(ll.front(), 1);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 2);
+}
+
+TEST(LinkedList, copyAssignmentOperator) {
+    LinkedList ll{1, 2};
+    LinkedList lll{3, 4};
+
+    lll = ll;
+
+    EXPECT_EQ(ll.front(), 1);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 2);
+
+    EXPECT_EQ(lll.front(), 1);
+    lll.pop_front();
+    EXPECT_EQ(lll.front(), 2);
+}

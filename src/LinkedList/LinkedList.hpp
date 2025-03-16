@@ -15,19 +15,21 @@ struct Node {
 
 template <typename T>
 class LinkedListIterator {
-    using NodeType = std::conditional_t<
+    using node = std::conditional_t<
         std::is_const_v<T>, const Node<std::remove_const_t<T>>, Node<T>>;
+    using node_pointer   = node*;
+    using node_reference = node&;
 
-    NodeType* current_;
+    node_pointer current_;
 
 public:
     using iterator_category = std::forward_iterator_tag;
-    using value_type        = NodeType;
+    using value_type        = node;
     using difference_type   = std::ptrdiff_t;
-    using pointer           = NodeType*;
-    using reference         = NodeType&&;
+    using pointer           = node_pointer;
+    using reference         = node_reference;
 
-    explicit LinkedListIterator(NodeType* current) : current_(current) {}
+    explicit LinkedListIterator(node_pointer current) : current_(current) {}
 
     T& operator*()  const { return  current_->data; };
     T* operator->() const { return &current_->data; };
@@ -50,7 +52,10 @@ public:
 
 template <typename T>
 class LinkedList {
-    Node<T>* root_{};
+    using node = Node<T>;
+    using node_pointer = node*;
+
+    node_pointer root_{};
 
 public:
     using value_type      = T;
@@ -63,17 +68,17 @@ public:
     LinkedList() : root_{nullptr} {}
 
     explicit LinkedList(T data)
-        : root_{new Node{std::move(data)}}
+        : root_{new node{std::move(data)}}
     {}
 
     explicit LinkedList(std::initializer_list<T> elements) : root_{nullptr} {
         if (elements.size() == 0) return;
 
-        root_ = new Node{*elements.begin()};
+        root_ = new node{*elements.begin()};
 
         auto current = root_;
         for (auto it = elements.begin() + 1; it != elements.end(); ++it) {
-            current->next = new Node{*it};
+            current->next = new node{*it};
             current = current->next;
         }
     }
@@ -81,25 +86,39 @@ public:
     LinkedList(const LinkedList& other) : root_{nullptr} {
         if (!other.root_) return;
 
-        root_ = new Node{other.root_->data};
+        node_pointer* current = &root_;
+        for (node_pointer other_current{other.root_}; other_current;
+            other_current = other_current->next, current = &((*current)->next)) {
 
-        auto current = root_;
-        auto other_current = other.root_->next;
-        while (other_current) {
-            current->next = new Node{other_current->data};
-            current = current->next;
-            other_current = other_current->next;
+            *current = new node{other_current->data};
         }
     }
 
-    LinkedList& operator=(const LinkedList&)     = default;
+    LinkedList& operator=(const LinkedList& other) {
+        if (this == &other) return *this;
+
+        clear();
+
+        if (!other.root_) return *this;
+
+        node_pointer* current = &root_;
+        for (node_pointer other_current{other.root_}; other_current;
+            other_current = other_current->next, current = &((*current)->next)) {
+
+            *current = new node{other_current->data};
+        }
+        return *this;
+    };
 
     LinkedList(LinkedList&&)            noexcept = default;
     LinkedList& operator=(LinkedList&&) noexcept = default;
 
     ~LinkedList() {
-        auto current = root_;
-        while (current) {
+        clear();
+    }
+
+    void clear() {
+        for (node_pointer current{root_}; current;) {
             const auto next = current->next;
             delete current;
             current = next;
@@ -108,16 +127,16 @@ public:
     }
 
     [[nodiscard]]
-    auto begin() { return iterator{root_}; };
+    auto begin() { return iterator{root_}; }
 
     [[nodiscard]]
-    auto end() { return iterator{nullptr}; };
+    auto end() { return iterator{nullptr}; }
 
     [[nodiscard]]
-    auto begin() const { return const_iterator{root_}; };
+    auto begin() const { return const_iterator{root_}; }
 
     [[nodiscard]]
-    auto end() const { return const_iterator{nullptr}; };
+    auto end() const { return const_iterator{nullptr}; }
 
     [[nodiscard]]
     bool is_empty() const {
@@ -137,24 +156,20 @@ public:
     [[nodiscard]]
     reference back() {
         auto current = root_;
-        while (current->next) {
-            current = current->next;
-        }
+        for (; current->next; current = current->next);
         return current->data; 
     }
 
     [[nodiscard]]
     const_reference back() const {
         auto current = root_;
-        while (current->next) {
-            current = current->next;
-        }
+        for (; current->next; current = current->next);
         return current->data;
     }
 
     void push_front(value_type data) {
         const auto next = root_;
-        root_ = new Node{std::move(data), next};
+        root_ = new node{std::move(data), next};
     }
 
     void pop_front() {
@@ -166,7 +181,7 @@ public:
     }
 
     void push_back(value_type data) {
-        const auto new_node = new Node{std::move(data)};
+        const auto new_node = new node{std::move(data)};
 
         if (!root_) {
             root_ = new_node;
@@ -174,9 +189,7 @@ public:
         } 
 
         auto current = root_;
-        while (current->next) {
-            current = current->next;
-        } 
+        for (; current->next; current = current->next);
         current->next = new_node;
     }
 
@@ -191,10 +204,7 @@ public:
 
         auto prev = root_;
         auto current = root_->next;
-        while (current->next) {
-            prev = current;
-            current = current->next;
-        }
+        for (; current->next; prev = current, current = current->next);
         delete current;
         prev->next = nullptr;
     }
