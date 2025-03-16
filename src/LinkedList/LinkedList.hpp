@@ -75,8 +75,14 @@ public:
     LinkedList(const LinkedList& other) : root_{nullptr} {
         if (!other.root_) return;
 
-        for (const auto& e : other) {
-            push_back(e);
+        root_ = new Node{other.root_->data};
+
+        auto current = root_;
+        auto other_current = other.root_->next;
+        while (other_current) {
+            current->next = new Node{other_current->data};
+            current = current->next;
+            other_current = other_current->next;
         }
     }
 
