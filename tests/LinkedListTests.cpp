@@ -260,3 +260,43 @@ TEST(LinkedList, copyAssignmentOperator) {
     lll.pop_front();
     EXPECT_EQ(lll.front(), 2);
 }
+
+TEST(LinkedList, swap) {
+    LinkedList l1{1, 2};
+    LinkedList l2{3, 4};
+
+    swap(l1, l2);
+
+    EXPECT_EQ(l1.front(), 3);
+    l1.pop_front();
+    EXPECT_EQ(l1.front(), 4);
+
+    EXPECT_EQ(l2.front(), 1);
+    l2.pop_front();
+    EXPECT_EQ(l2.front(), 2);
+}
+
+TEST(LinkedList, moveCopyConstructor) {
+    LinkedList l1{1, 2};
+    LinkedList l2(std::move(l1));
+
+    ASSERT_TRUE(l1.is_empty());
+
+    EXPECT_EQ(l2.front(), 1);
+    l2.pop_front();
+    EXPECT_EQ(l2.front(), 2);
+}
+
+TEST(LinkedList, moveAssignmentOperator) {
+    LinkedList l1{1, 2};
+    LinkedList l2{3, 4};
+
+    l1 = std::move(l2);
+
+    ASSERT_TRUE(l2.is_empty());
+
+    EXPECT_EQ(l1.front(), 3);
+    l1.pop_front();
+    EXPECT_EQ(l1.front(), 4);
+}
+

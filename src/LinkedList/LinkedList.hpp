@@ -110,8 +110,16 @@ public:
         return *this;
     };
 
-    LinkedList(LinkedList&&)            noexcept = default;
-    LinkedList& operator=(LinkedList&&) noexcept = default;
+    LinkedList(LinkedList&& other) noexcept : LinkedList() {
+        swap(*this, other);
+    }
+
+    LinkedList& operator=(LinkedList&& other) noexcept {
+        // copy & swap idiom
+        LinkedList tmp(std::move(other));
+        swap(*this, tmp);
+        return *this;
+    }
 
     ~LinkedList() {
         clear();
@@ -124,6 +132,11 @@ public:
             current = next;
         }
         root_ = nullptr;
+    }
+
+    friend void swap(LinkedList& l1, LinkedList& l2) noexcept {
+        using std::swap;
+        swap(l1.root_, l2.root_);
     }
 
     [[nodiscard]]
