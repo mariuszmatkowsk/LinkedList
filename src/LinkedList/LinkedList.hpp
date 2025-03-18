@@ -57,6 +57,14 @@ class LinkedList {
 
     node_pointer root_{};
 
+    void copy_from(const LinkedList& other) {
+        node_pointer* current = &root_;
+        for (node_pointer other_current{other.root_}; other_current;
+                other_current = other_current->next, current = &((*current)->next)) {
+            *current = new Node{other_current->data};
+        }
+    }
+
 public:
     using value_type      = T;
     using reference       = value_type&;
@@ -84,33 +92,18 @@ public:
     }
 
     LinkedList(const LinkedList& other) : root_{nullptr} {
-        if (!other.root_) return;
-
-        node_pointer* current = &root_;
-        for (node_pointer other_current{other.root_}; other_current;
-            other_current = other_current->next, current = &((*current)->next)) {
-
-            *current = new node{other_current->data};
-        }
+       copy_from(other);
     }
 
     LinkedList& operator=(const LinkedList& other) {
         if (this == &other) return *this;
 
         clear();
-
-        if (!other.root_) return *this;
-
-        node_pointer* current = &root_;
-        for (node_pointer other_current{other.root_}; other_current;
-            other_current = other_current->next, current = &((*current)->next)) {
-
-            *current = new node{other_current->data};
-        }
+        copy_from(other);
         return *this;
-    };
+    }
 
-    LinkedList(LinkedList&& other) noexcept : LinkedList() {
+    LinkedList(LinkedList&& other) noexcept {
         swap(*this, other);
     }
 
