@@ -150,6 +150,11 @@ public:
     }
 
     [[nodiscard]]
+    bool contains(const_reference value) const {
+        return std::find(begin(), end(), value) != end();
+    }
+
+    [[nodiscard]]
     reference front() {
         return root_->data;
     }

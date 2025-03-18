@@ -300,3 +300,18 @@ TEST(LinkedList, moveAssignmentOperator) {
     EXPECT_EQ(l1.front(), 4);
 }
 
+TEST(LinkedList, contains_EmptyList) {
+    LinkedList<int> l1{};
+
+    EXPECT_FALSE(l1.contains(9));
+}
+
+TEST(LinkedList, contains) {
+    LinkedList l1{1, 3, 5};
+
+    EXPECT_TRUE(l1.contains(1));
+    EXPECT_TRUE(l1.contains(3));
+    EXPECT_TRUE(l1.contains(5));
+    EXPECT_FALSE(l1.contains(9));
+}
+
