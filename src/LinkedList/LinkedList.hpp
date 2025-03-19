@@ -16,8 +16,10 @@ struct Node {
 
 template <typename T>
 class LinkedListIterator {
-    using node = std::conditional_t<
-        std::is_const_v<T>, const Node<std::remove_const_t<T>>, Node<T>>;
+    using node           = std::conditional_t<
+                                        std::is_const_v<T>,
+                                        const Node<std::remove_const_t<T>>,
+                                        Node<T>>;
     using node_pointer   = node*;
     using node_reference = node&;
 
@@ -30,24 +32,25 @@ public:
     using pointer           = node_pointer;
     using reference         = node_reference;
 
-    explicit LinkedListIterator(node_pointer current) : current_(current) {}
+    explicit constexpr LinkedListIterator(node_pointer current)
+        : current_(current) {}
 
-    T& operator*()  const { return  current_->data; };
-    T* operator->() const { return &current_->data; };
+    constexpr T& operator*()  const { return  current_->data; };
+    constexpr T* operator->() const { return &current_->data; };
 
-    LinkedListIterator& operator++() {
+    constexpr LinkedListIterator& operator++() {
         current_ = current_->next;
         return *this;
     }
 
-    friend auto operator==(
+    friend constexpr auto operator==(
             const LinkedListIterator& lhs, const LinkedListIterator& rhs) {
         return lhs.current_ == rhs.current_;
     }
 
-    friend auto operator!=(
+    friend constexpr auto operator!=(
             const LinkedListIterator& lhs, const LinkedListIterator& rhs) {
-        return lhs.current_ != rhs.current_;
+        return !(lhs == rhs);
     }
 };
 
@@ -58,7 +61,7 @@ class LinkedList {
 
     node_pointer root_{};
 
-    void copy_from(const LinkedList& other) {
+    constexpr void copy_from(const LinkedList& other) {
         node_pointer* current = &root_;
         for (node_pointer other_current{other.root_}; other_current;
                 other_current = other_current->next,
@@ -77,13 +80,11 @@ public:
     using iterator        = LinkedListIterator<T>;
     using const_iterator  = LinkedListIterator<const T>;
 
-    LinkedList() : root_{nullptr} {}
+    constexpr LinkedList() : root_{nullptr} {}
 
-    explicit LinkedList(T data)
-        : root_{new node{std::move(data)}}
-    {}
+    explicit LinkedList(T data) : root_{new node{std::move(data)}} {}
 
-    explicit LinkedList(std::initializer_list<T> elements) : root_{nullptr} {
+    explicit constexpr LinkedList(std::initializer_list<T> elements) : root_{nullptr} {
         node_pointer* current = &root_;
         for (auto it{elements.begin()}; it != elements.end();
                 ++it, current = &((*current)->next)) {
@@ -91,11 +92,9 @@ public:
         }
     }
 
-    LinkedList(const LinkedList& other) : root_{nullptr} {
-       copy_from(other);
-    }
+    constexpr LinkedList(const LinkedList& other) : root_{nullptr} { copy_from(other); }
 
-    LinkedList& operator=(const LinkedList& other) {
+    constexpr LinkedList& operator=(const LinkedList& other) {
         if (this == &other) return *this;
 
         clear();
@@ -103,22 +102,18 @@ public:
         return *this;
     }
 
-    LinkedList(LinkedList&& other) noexcept {
-        swap(*this, other);
-    }
+    constexpr LinkedList(LinkedList&& other) noexcept { swap(*this, other); }
 
-    LinkedList& operator=(LinkedList&& other) noexcept {
+    constexpr LinkedList& operator=(LinkedList&& other) noexcept {
         // copy & swap idiom
         LinkedList tmp(std::move(other));
         swap(*this, tmp);
         return *this;
     }
 
-    ~LinkedList() {
-        clear();
-    }
+    constexpr ~LinkedList() { clear(); }
 
-    void clear() {
+    constexpr void clear() {
         for (node_pointer current{root_}; current;) {
             const auto next = current->next;
             delete current;
@@ -127,42 +122,36 @@ public:
         root_ = nullptr;
     }
 
-    friend void swap(LinkedList& l1, LinkedList& l2) noexcept {
+    friend constexpr void swap(LinkedList& l1, LinkedList& l2) noexcept {
         using std::swap;
         swap(l1.root_, l2.root_);
     }
 
     [[nodiscard]]
-    auto begin() { return iterator{root_}; }
+    constexpr auto begin() { return iterator{root_}; }
 
     [[nodiscard]]
-    auto end() { return iterator{nullptr}; }
+    constexpr auto end() { return iterator{nullptr}; }
 
     [[nodiscard]]
-    auto begin() const { return const_iterator{root_}; }
+    constexpr auto begin() const { return const_iterator{root_}; }
 
     [[nodiscard]]
-    auto end() const { return const_iterator{nullptr}; }
+    constexpr auto end() const { return const_iterator{nullptr}; }
 
     [[nodiscard]]
-    bool is_empty() const {
-        return root_ == nullptr;
-    }
+    constexpr bool is_empty() const { return root_ == nullptr; }
 
     [[nodiscard]]
-    bool contains(const_reference value) const {
+    constexpr bool contains(const_reference value) const {
         return std::find(begin(), end(), value) != end();
     }
 
     [[nodiscard]]
-    reference front() {
-        return root_->data;
-    }
+    reference front() { return root_->data; }
 
     [[nodiscard]]
-    const_reference front() const {
-        return root_->data;
-    }
+    const_reference front() const { return root_->data; }
 
     [[nodiscard]]
     reference back() {
@@ -220,10 +209,12 @@ public:
         prev->next = nullptr;
     }
 
-    friend auto operator==(const LinkedList& lhs, const LinkedList& rhs) {
+    friend constexpr auto operator==(const LinkedList& lhs, const LinkedList& rhs) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 };
+
+static_assert(LinkedList<int>() == LinkedList<int>());
 
 template <typename T>
 struct std::formatter<LinkedList<T>> {

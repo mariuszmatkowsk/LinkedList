@@ -334,3 +334,30 @@ TEST(LinkedList, shouldWorkWithStdFormat) {
     EXPECT_EQ(std::format("{}", ll), expected);
 }
 
+TEST(LinkedList, defaultConstructorShouldBeConstexpr) {
+    constexpr LinkedList<int> ll{};
+}
+
+TEST(LinkedList, emptyInitializerListShouldBeConstexpr) {
+    constexpr LinkedList<int> l{};
+}
+
+TEST(LinkedList, is_empty_constexpr) {
+    constexpr LinkedList<int> ll;
+
+    static_assert(ll.is_empty() == true, "Must be constexpr");
+}
+
+TEST(LinkedList, beginAndEndShouldBeConstexpr) {
+    constexpr LinkedList<int> ll;
+
+    static_assert(ll.begin() == ll.end(),
+        "Constexpr begin and end should be equals for empty list");
+}
+
+TEST(LinkedList, containsShouldBeConstexpr) {
+    constexpr LinkedList<int> ll;
+
+    static_assert(ll.contains(3) == false, "Should return false");
+}
+
