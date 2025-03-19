@@ -15,7 +15,7 @@ TEST(LinkedList, canCreateLinkedListWithInitElement) {
     LinkedList<int> ll{5};
 
     EXPECT_FALSE(ll.is_empty());
-    EXPECT_EQ(ll.front(), 5);
+    EXPECT_EQ(*(ll.front()), 5);
 }
 
 TEST(LinkedList, shouldDeduceType) {
@@ -65,14 +65,24 @@ TEST(LinkedList, front) {
 
     EXPECT_FALSE(l1.is_empty());
 
+    EXPECT_TRUE(l1.front().has_value());
     EXPECT_EQ(l1.front(), 6);
-    EXPECT_EQ(l2.front(), 7);
+
+    EXPECT_TRUE(l2.front().has_value());
+    EXPECT_EQ(l2.front().value(), 7);
+}
+
+TEST(LinkedList, frontOnEmptyList) {
+    LinkedList<int> ll{};
+
+    EXPECT_FALSE(ll.front().has_value());
+    EXPECT_EQ(ll.front(), std::unexpected(LinkedListError::EmptyList));
 }
 
 TEST(LinkedList, canModifyElementByFront) {
     LinkedList<int> ll{66};
 
-    ll.front() = 77;
+    ll.front().value().get() = 77;
 
     EXPECT_FALSE(ll.is_empty());
     EXPECT_EQ(ll.front(), 77);
@@ -85,14 +95,23 @@ TEST(LinkedList, back) {
 
     EXPECT_FALSE(l1.is_empty());
 
+    EXPECT_TRUE(l1.back().has_value());
     EXPECT_EQ(l1.back(), 6);
+    EXPECT_TRUE(l2.back().has_value());
     EXPECT_EQ(l2.back(), 7);
+}
+
+TEST(LinkdeList, backOnEmptyList) {
+    LinkedList<int> ll{};
+
+    EXPECT_FALSE(ll.back().has_value());
+    EXPECT_EQ(ll.back(), std::unexpected(LinkedListError::EmptyList));
 }
 
 TEST(LinkedList, canModifyElementByBack) {
     LinkedList<int> ll{66};
 
-    ll.back() = 77;
+    ll.back().value().get() = 77;
 
     EXPECT_FALSE(ll.is_empty());
     EXPECT_EQ(ll.back(), 77);
@@ -387,10 +406,16 @@ TEST(LinkedList, canBeUseWithForEachToModifyContent) {
         e = e * 2;
     });
 
-    EXPECT_EQ(ll.front(), 2);
+    EXPECT_TRUE(ll.front().has_value());
+    EXPECT_EQ(ll.front().value(), 2);
     ll.pop_front();
-    EXPECT_EQ(ll.front(), 4);
+    EXPECT_TRUE(ll.front().has_value());
+    EXPECT_EQ(ll.front().value(), 4);
     ll.pop_front();
-    EXPECT_EQ(ll.front(), 6);
+    EXPECT_TRUE(ll.front().has_value());
+    EXPECT_EQ(ll.front().value(), 6);
+    ll.pop_front();
+    EXPECT_FALSE(ll.front().has_value());
+    EXPECT_EQ(ll.front(), std::unexpected(LinkedListError::EmptyList));
 }
 

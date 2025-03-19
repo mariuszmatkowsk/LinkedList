@@ -4,6 +4,12 @@
 #include <utility>
 #include <format>
 #include <ostream>
+#include <expected>
+#include <functional>
+
+enum class LinkedListError {
+    EmptyList,
+};
 
 template <typename T>
 struct Node {
@@ -149,20 +155,32 @@ public:
     }
 
     [[nodiscard]]
-    reference front() { return root_->data; }
-
-    [[nodiscard]]
-    const_reference front() const { return root_->data; }
-
-    [[nodiscard]]
-    reference back() {
-        auto current = root_;
-        for (; current->next; current = current->next);
-        return current->data; 
+    std::expected<std::reference_wrapper<value_type>, LinkedListError>
+    front() {
+        if (!root_) return std::unexpected(LinkedListError::EmptyList);
+        return root_->data;
     }
 
     [[nodiscard]]
-    const_reference back() const {
+    std::expected<std::reference_wrapper<const value_type>, LinkedListError>
+    front() const {
+        if (!root_) return std::unexpected(LinkedListError::EmptyList);
+        return root_->data;
+    }
+
+    [[nodiscard]]
+    std::expected<std::reference_wrapper<value_type>, LinkedListError>
+    back() {
+        if (!root_) return std::unexpected(LinkedListError::EmptyList);
+        auto current = root_;
+        for (; current->next; current = current->next);
+        return current->data;
+    }
+
+    [[nodiscard]]
+    std::expected<std::reference_wrapper<const value_type>, LinkedListError>
+    back() const {
+        if (!root_) return std::unexpected(LinkedListError::EmptyList);
         auto current = root_;
         for (; current->next; current = current->next);
         return current->data;
