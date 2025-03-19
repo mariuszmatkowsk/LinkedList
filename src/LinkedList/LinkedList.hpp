@@ -61,7 +61,8 @@ class LinkedList {
     void copy_from(const LinkedList& other) {
         node_pointer* current = &root_;
         for (node_pointer other_current{other.root_}; other_current;
-                other_current = other_current->next, current = &((*current)->next)) {
+                other_current = other_current->next,
+                current = &((*current)->next)) {
             *current = new Node{other_current->data};
         }
     }
@@ -83,14 +84,10 @@ public:
     {}
 
     explicit LinkedList(std::initializer_list<T> elements) : root_{nullptr} {
-        if (elements.size() == 0) return;
-
-        root_ = new node{*elements.begin()};
-
-        auto current = root_;
-        for (auto it = elements.begin() + 1; it != elements.end(); ++it) {
-            current->next = new node{*it};
-            current = current->next;
+        node_pointer* current = &root_;
+        for (auto it{elements.begin()}; it != elements.end();
+                ++it, current = &((*current)->next)) {
+            *current = new node(*it);
         }
     }
 
