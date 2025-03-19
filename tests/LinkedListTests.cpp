@@ -361,3 +361,17 @@ TEST(LinkedList, containsShouldBeConstexpr) {
     static_assert(ll.contains(3) == false, "Should return false");
 }
 
+TEST(LinkedList, canBeUseWithForEachToModifyContent) {
+    LinkedList ll{1, 2, 3};
+
+    std::for_each(std::begin(ll), std::end(ll), [](auto& e) {
+        e = e * 2;
+    });
+
+    EXPECT_EQ(ll.front(), 2);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 4);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 6);
+}
+

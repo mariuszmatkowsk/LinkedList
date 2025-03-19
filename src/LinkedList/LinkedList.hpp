@@ -140,10 +140,10 @@ public:
     constexpr auto end() const { return const_iterator{nullptr}; }
 
     [[nodiscard]]
-    constexpr bool is_empty() const { return root_ == nullptr; }
+    constexpr auto is_empty() const { return root_ == nullptr; }
 
     [[nodiscard]]
-    constexpr bool contains(const_reference value) const {
+    constexpr auto contains(const_reference value) const {
         return std::find(begin(), end(), value) != end();
     }
 
