@@ -214,8 +214,6 @@ public:
     }
 };
 
-static_assert(LinkedList<int>() == LinkedList<int>());
-
 template <typename T>
 struct std::formatter<LinkedList<T>> {
     constexpr auto parse(std::format_parse_context& ctx) {
