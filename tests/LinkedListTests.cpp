@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <utility>
+#include <format>
 
 TEST(LinkedList, canCreateEmptyLinkedList) {
     LinkedList<int> ll{};
@@ -58,14 +59,14 @@ TEST(LinkedList, memoryShouldBeFreeOnce) {
 }
 
 TEST(LinkedList, front) {
-    LinkedList<int> ll{6};
+    LinkedList<int> l1{6};
 
-    const LinkedList<int> lll{7};
+    const LinkedList<int> l2{7};
 
-    EXPECT_FALSE(ll.is_empty());
+    EXPECT_FALSE(l1.is_empty());
 
-    EXPECT_EQ(ll.front(), 6);
-    EXPECT_EQ(lll.front(), 7);
+    EXPECT_EQ(l1.front(), 6);
+    EXPECT_EQ(l2.front(), 7);
 }
 
 TEST(LinkedList, canModifyElementByFront) {
@@ -78,14 +79,14 @@ TEST(LinkedList, canModifyElementByFront) {
 }
 
 TEST(LinkedList, back) {
-    LinkedList<int> ll{6};
+    LinkedList<int> l1{6};
 
-    const LinkedList<int> lll{7};
+    const LinkedList<int> l2{7};
 
-    EXPECT_FALSE(ll.is_empty());
+    EXPECT_FALSE(l1.is_empty());
 
-    EXPECT_EQ(ll.back(), 6);
-    EXPECT_EQ(lll.back(), 7);
+    EXPECT_EQ(l1.back(), 6);
+    EXPECT_EQ(l2.back(), 7);
 }
 
 TEST(LinkedList, canModifyElementByBack) {
@@ -160,26 +161,26 @@ TEST(LinkedList, initializeWithManyElements) {
 }
 
 TEST(LinkedList, canCompareTwoLinkedLists_Equal) {
-    LinkedList<int> ll{2, 3};
-    LinkedList<int> lll{2, 3};
+    LinkedList<int> l1{2, 3};
+    LinkedList<int> l2{2, 3};
 
-    EXPECT_EQ(ll, lll);
+    EXPECT_EQ(l1, l2);
 
-    LinkedList<int> l1{};
-    LinkedList<int> l2{};
+    l1.clear();
+    l2.clear();
 
     EXPECT_EQ(l1, l2);
 }
 
 TEST(LinkedList, canCompareTwoLinkedLists_NotEqual) {
-    LinkedList<int> l{};
-    LinkedList<int> ll{2, 3, 4};
-    LinkedList<int> lll{2, 3};
-    LinkedList<int> llll{2, 4, 3};
+    LinkedList<int> l1{};
+    LinkedList<int> l2{2, 3, 4};
+    LinkedList<int> l3{2, 3};
+    LinkedList<int> l4{2, 4, 3};
  
-    EXPECT_NE(l, ll);
-    EXPECT_NE(ll, lll);
-    EXPECT_NE(ll, llll);
+    EXPECT_NE(l1, l2);
+    EXPECT_NE(l2, l3);
+    EXPECT_NE(l2, l4);
 }
 
 TEST(LinkedList, begin) {
@@ -219,21 +220,20 @@ TEST(LinkedList, canModifyElementBytRangeBasedLoop) {
 }
 
 TEST(LinkedList, canInitializeLinkedListFromAnother) {
-    LinkedList<int> ll{1, 2, 3};
+    LinkedList<int> l1{1, 2, 3};
+    LinkedList<int> l2 = l1;
 
-    LinkedList<int> lll = ll;
+    EXPECT_EQ(l1.front(), 1);
+    l1.pop_front();
+    EXPECT_EQ(l1.front(), 2);
+    l1.pop_front();
+    EXPECT_EQ(l1.front(), 3);
 
-    EXPECT_EQ(ll.front(), 1);
-    ll.pop_front();
-    EXPECT_EQ(ll.front(), 2);
-    ll.pop_front();
-    EXPECT_EQ(ll.front(), 3);
-
-    EXPECT_EQ(lll.front(), 1);
-    lll.pop_front();
-    EXPECT_EQ(lll.front(), 2);
-    lll.pop_front();
-    EXPECT_EQ(lll.front(), 3);
+    EXPECT_EQ(l2.front(), 1);
+    l2.pop_front();
+    EXPECT_EQ(l2.front(), 2);
+    l2.pop_front();
+    EXPECT_EQ(l2.front(), 3);
 }
 
 TEST(LinkedList, copyAssignemtnOperatorDoNothingWhenSelfAssignment) {
@@ -247,18 +247,18 @@ TEST(LinkedList, copyAssignemtnOperatorDoNothingWhenSelfAssignment) {
 }
 
 TEST(LinkedList, copyAssignmentOperator) {
-    LinkedList ll{1, 2};
-    LinkedList lll{3, 4};
+    LinkedList l1{1, 2};
+    LinkedList l2{3, 4};
 
-    lll = ll;
+    l2 = l1;
 
-    EXPECT_EQ(ll.front(), 1);
-    ll.pop_front();
-    EXPECT_EQ(ll.front(), 2);
+    EXPECT_EQ(l1.front(), 1);
+    l1.pop_front();
+    EXPECT_EQ(l1.front(), 2);
 
-    EXPECT_EQ(lll.front(), 1);
-    lll.pop_front();
-    EXPECT_EQ(lll.front(), 2);
+    EXPECT_EQ(l2.front(), 1);
+    l2.pop_front();
+    EXPECT_EQ(l2.front(), 2);
 }
 
 TEST(LinkedList, swap) {
@@ -301,17 +301,36 @@ TEST(LinkedList, moveAssignmentOperator) {
 }
 
 TEST(LinkedList, contains_EmptyList) {
-    LinkedList<int> l1{};
+    LinkedList<int> ll{};
 
-    EXPECT_FALSE(l1.contains(9));
+    EXPECT_FALSE(ll.contains(9));
 }
 
 TEST(LinkedList, contains) {
-    LinkedList l1{1, 3, 5};
+    LinkedList ll{1, 3, 5};
 
-    EXPECT_TRUE(l1.contains(1));
-    EXPECT_TRUE(l1.contains(3));
-    EXPECT_TRUE(l1.contains(5));
-    EXPECT_FALSE(l1.contains(9));
+    EXPECT_TRUE(ll.contains(1));
+    EXPECT_TRUE(ll.contains(3));
+    EXPECT_TRUE(ll.contains(5));
+    EXPECT_FALSE(ll.contains(9));
+}
+
+TEST(LinkedList, shouldWorkWithStdFormat) {
+    LinkedList ll{1};
+
+    std::string expected{"[1 -> NULL]"};
+    EXPECT_EQ(std::format("{}", ll), expected);
+
+    ll.clear();
+
+    expected = "[NULL]";
+    EXPECT_EQ(std::format("{}", ll), expected);
+
+    ll.push_back(3);
+    ll.push_back(7);
+    ll.push_back(8);
+
+    expected = "[3 -> 7 -> 8 -> NULL]";
+    EXPECT_EQ(std::format("{}", ll), expected);
 }
 

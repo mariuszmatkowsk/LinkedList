@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <utility>
+#include <format>
 
 template <typename T>
 struct Node {
@@ -64,6 +65,8 @@ class LinkedList {
             *current = new Node{other_current->data};
         }
     }
+
+    friend struct std::formatter<LinkedList>;
 
 public:
     using value_type      = T;
@@ -222,6 +225,23 @@ public:
 
     friend auto operator==(const LinkedList& lhs, const LinkedList& rhs) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+};
+
+template <typename T>
+struct std::formatter<LinkedList<T>> {
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    auto format(const LinkedList<T>& ll, std::format_context& ctx) const {
+        const auto& out = ctx.out();
+        std::format_to(out, "[");
+        for (auto current{ll.root_}; current; current = current->next) {
+            std::format_to(out, "{} {} ", current->data, "->");
+        }
+        std::format_to(out, "NULL");
+        return std::format_to(out, "]");
     }
 };
 
