@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <utility>
 #include <format>
+#include <ostream>
 
 template <typename T>
 struct Node {
@@ -212,6 +213,15 @@ public:
     friend constexpr auto operator==(const LinkedList& lhs, const LinkedList& rhs) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const LinkedList& ll) {
+        os << "[";
+        for (auto current{ll.root_}; current; current = current->next) {
+            os << current->data << " -> ";
+        }
+        os << "NULL]";
+        return os;
+    };
 };
 
 template <typename T>

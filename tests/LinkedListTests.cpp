@@ -334,6 +334,25 @@ TEST(LinkedList, shouldWorkWithStdFormat) {
     EXPECT_EQ(std::format("{}", ll), expected);
 }
 
+TEST(LinkedList, shouldWorkWithOutputStream) {
+    LinkedList ll{1, 3};
+
+    std::stringstream ss;
+    ss << ll;
+
+    std::string expected{"[1 -> 3 -> NULL]"};
+    EXPECT_EQ(ss.str(), expected);
+
+    ll.clear();
+    ss.str("");
+    ss.clear();
+
+    ss << ll;
+
+    expected = "[NULL]";
+    EXPECT_EQ(ss.str(), expected);
+}
+
 TEST(LinkedList, defaultConstructorShouldBeConstexpr) {
     constexpr LinkedList<int> ll{};
 }
