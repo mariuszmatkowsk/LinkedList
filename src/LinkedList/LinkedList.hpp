@@ -77,6 +77,14 @@ class LinkedList {
         }
     }
 
+    std::expected<node_pointer, LinkedListError> get_last() const {
+        if (!root_) return std::unexpected(LinkedListError::EmptyList);
+
+        auto current = root_;
+        for(; current->next; current = current->next);
+        return current;
+    }
+
     friend struct std::formatter<LinkedList>;
 
 public:
@@ -91,7 +99,8 @@ public:
 
     explicit LinkedList(T data) : root_{new node{std::move(data)}} {}
 
-    explicit constexpr LinkedList(std::initializer_list<T> elements) : root_{nullptr} {
+    explicit constexpr LinkedList(std::initializer_list<T> elements)
+            : root_{nullptr} {
         node_pointer* current = &root_;
         for (auto it{elements.begin()}; it != elements.end();
                 ++it, current = &((*current)->next)) {
@@ -99,7 +108,9 @@ public:
         }
     }
 
-    constexpr LinkedList(const LinkedList& other) : root_{nullptr} { copy_from(other); }
+    constexpr LinkedList(const LinkedList& other) : root_{nullptr} {
+        copy_from(other);
+    }
 
     constexpr LinkedList& operator=(const LinkedList& other) {
         if (this == &other) return *this;
@@ -171,19 +182,21 @@ public:
     [[nodiscard]]
     std::expected<std::reference_wrapper<value_type>, LinkedListError>
     back() {
-        if (!root_) return std::unexpected(LinkedListError::EmptyList);
-        auto current = root_;
-        for (; current->next; current = current->next);
-        return current->data;
+        auto last = get_last();
+        if (last) {
+            return last.value()->data;
+        }
+        return std::unexpected(last.error());
     }
 
     [[nodiscard]]
     std::expected<std::reference_wrapper<const value_type>, LinkedListError>
     back() const {
-        if (!root_) return std::unexpected(LinkedListError::EmptyList);
-        auto current = root_;
-        for (; current->next; current = current->next);
-        return current->data;
+        auto last = get_last();
+        if (last) {
+            return last.value()->data;
+        }
+        return std::unexpected(last.error());
     }
 
     void push_front(value_type data) {
@@ -202,14 +215,13 @@ public:
     void push_back(value_type data) {
         const auto new_node = new node{std::move(data)};
 
-        if (!root_) {
-            root_ = new_node;
+        auto last = get_last();
+        if (last) {
+            last.value()->next = new_node;
             return;
-        } 
+        }
 
-        auto current = root_;
-        for (; current->next; current = current->next);
-        current->next = new_node;
+        root_ = new_node;
     }
 
     void pop_back() {
@@ -228,15 +240,15 @@ public:
         prev->next = nullptr;
     }
 
-    friend constexpr auto operator==(const LinkedList& lhs, const LinkedList& rhs) {
+    friend constexpr auto operator==(
+            const LinkedList& lhs, const LinkedList& rhs) {
         return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     friend std::ostream& operator<<(std::ostream& os, const LinkedList& ll) {
         os << "[";
-        for (auto current{ll.root_}; current; current = current->next) {
-            os << current->data << " -> ";
-        }
+        std::for_each(std::begin(ll), std::end(ll), [&os](const auto element) {
+            os << element << " -> "; });
         os << "NULL]";
         return os;
     };
@@ -251,9 +263,8 @@ struct std::formatter<LinkedList<T>> {
     auto format(const LinkedList<T>& ll, std::format_context& ctx) const {
         const auto& out = ctx.out();
         std::format_to(out, "[");
-        for (auto current{ll.root_}; current; current = current->next) {
-            std::format_to(out, "{} {} ", current->data, "->");
-        }
+        std::for_each(std::begin(ll), std::end(ll), [&out](const auto& element)
+            { std::format_to(out, "{} {} ", element, "->"); });
         std::format_to(out, "NULL");
         return std::format_to(out, "]");
     }
