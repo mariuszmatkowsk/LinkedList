@@ -67,6 +67,7 @@ class LinkedList {
     using node_pointer = node*;
 
     node_pointer root_{};
+    std::size_t  size_{};
 
     constexpr void copy_from(const LinkedList& other) {
         node_pointer* current = &root_;
@@ -75,6 +76,7 @@ class LinkedList {
                 current = &((*current)->next)) {
             *current = new Node{other_current->data};
         }
+        size_ = other.size_;
     }
 
     std::expected<node_pointer, LinkedListError> get_last() const {
@@ -95,20 +97,21 @@ public:
     using iterator        = LinkedListIterator<T>;
     using const_iterator  = LinkedListIterator<const T>;
 
-    constexpr LinkedList() : root_{nullptr} {}
+    constexpr LinkedList() : root_{nullptr}, size_{0} {}
 
-    explicit LinkedList(T data) : root_{new node{std::move(data)}} {}
+    explicit LinkedList(T data) : root_{new node{std::move(data)}}, size_{1} {}
 
     explicit constexpr LinkedList(std::initializer_list<T> elements)
-            : root_{nullptr} {
+            : root_{nullptr}, size_{0} {
         node_pointer* current = &root_;
         for (auto it{elements.begin()}; it != elements.end();
                 ++it, current = &((*current)->next)) {
             *current = new node(*it);
+            ++size_;
         }
     }
 
-    constexpr LinkedList(const LinkedList& other) : root_{nullptr} {
+    constexpr LinkedList(const LinkedList& other) : root_{nullptr}, size_{0} {
         copy_from(other);
     }
 
@@ -138,12 +141,17 @@ public:
             current = next;
         }
         root_ = nullptr;
+        size_ = 0;
     }
 
     friend constexpr void swap(LinkedList& l1, LinkedList& l2) noexcept {
         using std::swap;
         swap(l1.root_, l2.root_);
+        swap(l1.size_, l2.size_);
     }
+
+    [[nodiscard]]
+    constexpr std::size_t size() const { return size_; };
 
     [[nodiscard]]
     constexpr auto begin() { return iterator{root_}; }
@@ -202,6 +210,7 @@ public:
     void push_front(value_type data) {
         const auto next = root_;
         root_ = new node{std::move(data), next};
+        ++size_;
     }
 
     void pop_front() {
@@ -210,6 +219,7 @@ public:
         const auto next = root_->next;
         delete root_;
         root_ = next;
+        --size_;
     }
 
     void push_back(value_type data) {
@@ -218,10 +228,10 @@ public:
         auto last = get_last();
         if (last) {
             last.value()->next = new_node;
-            return;
+        } else {
+            root_ = new_node;
         }
-
-        root_ = new_node;
+        ++size_;
     }
 
     void pop_back() {
@@ -230,6 +240,7 @@ public:
         if (!root_->next) {
             delete root_;
             root_ = nullptr;
+            --size_;
             return;
         }
 
@@ -238,10 +249,12 @@ public:
         for (; current->next; prev = current, current = current->next);
         delete current;
         prev->next = nullptr;
+        --size_;
     }
 
     friend constexpr auto operator==(
             const LinkedList& lhs, const LinkedList& rhs) {
+        if (lhs.size() != rhs.size()) return false;
         return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 

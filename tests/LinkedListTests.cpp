@@ -9,12 +9,14 @@ TEST(LinkedList, canCreateEmptyLinkedList) {
     LinkedList<int> ll{};
 
     EXPECT_TRUE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 0);
 }
 
 TEST(LinkedList, canCreateLinkedListWithInitElement) {
     LinkedList<int> ll{5};
 
     EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 1);
     EXPECT_EQ(*(ll.front()), 5);
 }
 
@@ -22,6 +24,7 @@ TEST(LinkedList, shouldDeduceType) {
     LinkedList ll{7};
 
     EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 1);
     EXPECT_EQ(ll.front(), 7);
 }
 
@@ -64,6 +67,7 @@ TEST(LinkedList, front) {
     const LinkedList<int> l2{7};
 
     EXPECT_FALSE(l1.is_empty());
+    EXPECT_EQ(l1.size(), 1);
 
     EXPECT_TRUE(l1.front().has_value());
     EXPECT_EQ(l1.front(), 6);
@@ -75,6 +79,7 @@ TEST(LinkedList, front) {
 TEST(LinkedList, frontOnEmptyList) {
     LinkedList<int> ll{};
 
+    EXPECT_EQ(ll.size(), 0);
     EXPECT_FALSE(ll.front().has_value());
     EXPECT_EQ(ll.front(), std::unexpected(LinkedListError::EmptyList));
 }
@@ -85,6 +90,7 @@ TEST(LinkedList, canModifyElementByFront) {
     ll.front().value().get() = 77;
 
     EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 1);
     EXPECT_EQ(ll.front(), 77);
 }
 
@@ -94,6 +100,7 @@ TEST(LinkedList, back) {
     const LinkedList<int> l2{7};
 
     EXPECT_FALSE(l1.is_empty());
+    EXPECT_EQ(l1.size(), 1);
 
     EXPECT_TRUE(l1.back().has_value());
     EXPECT_EQ(l1.back(), 6);
@@ -104,6 +111,8 @@ TEST(LinkedList, back) {
 TEST(LinkdeList, backOnEmptyList) {
     LinkedList<int> ll{};
 
+    EXPECT_TRUE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 0);
     EXPECT_FALSE(ll.back().has_value());
     EXPECT_EQ(ll.back(), std::unexpected(LinkedListError::EmptyList));
 }
@@ -114,23 +123,32 @@ TEST(LinkedList, canModifyElementByBack) {
     ll.back().value().get() = 77;
 
     EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 1);
     EXPECT_EQ(ll.back(), 77);
 }
 
 TEST(LinkedList, pop_front) {
     LinkedList<int> ll{77};
 
+    EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 1);
+
     ll.pop_front();
 
     EXPECT_TRUE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 0);
 }
 
 TEST(LinkedList, pop_back) {
     LinkedList<int> ll{77};
 
+    EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 1);
+
     ll.pop_back();
 
     EXPECT_TRUE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 0);
 }
 
 TEST(LinkedList, pushFront) {
@@ -141,12 +159,15 @@ TEST(LinkedList, pushFront) {
     ll.push_front(9);
 
     EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 3);
 
     // LIFO order
     EXPECT_EQ(ll.front(), 9);
     ll.pop_front();
+    EXPECT_EQ(ll.size(), 2);
     EXPECT_EQ(ll.front(), 6);
     ll.pop_front();
+    EXPECT_EQ(ll.size(), 1);
     EXPECT_EQ(ll.front(), 5);
 }
 
@@ -157,11 +178,15 @@ TEST(LinkedList, pushBack) {
     ll.push_back(3);
     ll.push_back(4);
 
+    EXPECT_EQ(ll.size(), 3);
+
     // FIFO order
     EXPECT_EQ(ll.front(), 2);
     ll.pop_front();
+    EXPECT_EQ(ll.size(), 2);
     EXPECT_EQ(ll.front(), 3);
     ll.pop_front();
+    EXPECT_EQ(ll.size(), 1);
     EXPECT_EQ(ll.front(), 4);
 }
 
@@ -169,13 +194,17 @@ TEST(LinkedList, initializeWithManyElements) {
     LinkedList ll{3, 45, 33, 77};
 
     EXPECT_FALSE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 4);
 
     EXPECT_EQ(ll.front(), 3);
     ll.pop_front();
+    EXPECT_EQ(ll.size(), 3);
     EXPECT_EQ(ll.front(), 45);
     ll.pop_front();
+    EXPECT_EQ(ll.size(), 2);
     EXPECT_EQ(ll.front(), 33);
     ll.pop_front();
+    EXPECT_EQ(ll.size(), 1);
     EXPECT_EQ(ll.front(), 77);
 }
 
@@ -242,6 +271,9 @@ TEST(LinkedList, canInitializeLinkedListFromAnother) {
     LinkedList<int> l1{1, 2, 3};
     LinkedList<int> l2 = l1;
 
+    EXPECT_EQ(l1.size(), 3);
+    EXPECT_EQ(l2.size(), 3);
+
     EXPECT_EQ(l1.front(), 1);
     l1.pop_front();
     EXPECT_EQ(l1.front(), 2);
@@ -260,6 +292,7 @@ TEST(LinkedList, copyAssignemtnOperatorDoNothingWhenSelfAssignment) {
 
     ll = ll;
 
+    EXPECT_EQ(ll.size(), 2);
     EXPECT_EQ(ll.front(), 1);
     ll.pop_front();
     EXPECT_EQ(ll.front(), 2);
@@ -270,6 +303,9 @@ TEST(LinkedList, copyAssignmentOperator) {
     LinkedList l2{3, 4};
 
     l2 = l1;
+
+    EXPECT_EQ(l1.size(), 2);
+    EXPECT_EQ(l2.size(), 2);
 
     EXPECT_EQ(l1.front(), 1);
     l1.pop_front();
@@ -300,7 +336,9 @@ TEST(LinkedList, moveCopyConstructor) {
     LinkedList l2(std::move(l1));
 
     ASSERT_TRUE(l1.is_empty());
+    ASSERT_EQ(l1.size(), 0);
 
+    EXPECT_EQ(l2.size(), 2);
     EXPECT_EQ(l2.front(), 1);
     l2.pop_front();
     EXPECT_EQ(l2.front(), 2);
@@ -313,6 +351,7 @@ TEST(LinkedList, moveAssignmentOperator) {
     l1 = std::move(l2);
 
     ASSERT_TRUE(l2.is_empty());
+    ASSERT_EQ(l2.size(), 0);
 
     EXPECT_EQ(l1.front(), 3);
     l1.pop_front();
@@ -384,6 +423,12 @@ TEST(LinkedList, is_empty_constexpr) {
     constexpr LinkedList<int> ll;
 
     static_assert(ll.is_empty() == true, "Must be constexpr");
+}
+
+TEST(LinkedList, size_constexpr) {
+    constexpr LinkedList<int> ll{};
+
+    static_assert(ll.size() == 0, "Empty list size 0");
 }
 
 TEST(LinkedList, beginAndEndShouldBeConstexpr) {
