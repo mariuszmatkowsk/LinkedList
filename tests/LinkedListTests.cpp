@@ -464,3 +464,47 @@ TEST(LinkedList, canBeUseWithForEachToModifyContent) {
     EXPECT_EQ(ll.front(), std::unexpected(LinkedListError::EmptyList));
 }
 
+TEST(LinkedList, canRemoveFirstElement) {
+    LinkedList ll{1, 3};
+
+    ll.remove(1);
+
+    EXPECT_EQ(ll.size(), 1);
+    EXPECT_EQ(ll.front(), 3);
+}
+
+TEST(LinkedList, canRemoveMiddleElement) {
+    LinkedList ll{1, 2, 3};
+
+    ll.remove(2);
+
+    EXPECT_EQ(ll.size(), 2);
+    EXPECT_EQ(ll.front(), 1);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 3);
+}
+
+TEST(LinkedList, canRemoveLastElement) {
+    LinkedList ll{1, 2, 3};
+
+    ll.remove(3);
+
+    EXPECT_EQ(ll.size(), 2);
+    EXPECT_EQ(ll.front(), 1);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 2);
+}
+
+TEST(LinkdeList, removeRemovesOnlyFirstOccurrence) {
+    LinkedList ll{1, 2, 2, 3};
+
+    ll.remove(2);
+
+    EXPECT_EQ(ll.size(), 3);
+    EXPECT_EQ(ll.front(), 1);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 2);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 3);
+}
+

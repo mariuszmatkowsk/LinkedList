@@ -244,7 +244,7 @@ public:
             return;
         }
 
-        auto prev = root_;
+        auto prev    = root_;
         auto current = root_->next;
         for (; current->next; prev = current, current = current->next);
         delete current;
@@ -265,6 +265,30 @@ public:
         os << "NULL]";
         return os;
     };
+
+    void remove(const_reference data) {
+        if (!root_) return;
+
+        if (root_->data == data) {
+            // First node needs to be deleted
+            const auto next = root_->next;
+            delete root_;
+            --size_;
+            root_ = next;
+        }
+
+        auto prev = root_;
+        for (auto current{root_->next}; current;
+                prev = current, current = current->next) {
+            if (current->data == data) {
+                const auto next = current->next;
+                prev->next      = next;
+                delete current;
+                --size_;
+                break;
+            }
+        }
+    }
 };
 
 template <typename T>
