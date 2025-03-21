@@ -464,6 +464,15 @@ TEST(LinkedList, canBeUseWithForEachToModifyContent) {
     EXPECT_EQ(ll.front(), std::unexpected(LinkedListError::EmptyList));
 }
 
+TEST(LinkdeList, removeDoNothingWhenListEmpty) {
+    LinkedList<double> ll{};
+
+    ll.remove(3);
+
+    EXPECT_TRUE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 0);
+}
+
 TEST(LinkedList, canRemoveFirstElement) {
     LinkedList ll{1, 3};
 
