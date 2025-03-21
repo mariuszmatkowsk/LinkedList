@@ -281,8 +281,7 @@ public:
         for (auto current{root_->next}; current;
                 prev = current, current = current->next) {
             if (current->data == data) {
-                const auto next = current->next;
-                prev->next      = next;
+                prev->next = current->next;
                 delete current;
                 --size_;
                 break;
