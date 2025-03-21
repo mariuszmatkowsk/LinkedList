@@ -15,7 +15,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 include(GNUInstallDirs)
 
 add_subdirectory(src)
-add_subdirectory(examples)
 
 option(BUILD_TESTS "Build tests" ON)
 option(BUILD_EXAMPLES "Build example executables" ON)
