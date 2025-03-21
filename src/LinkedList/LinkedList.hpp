@@ -270,7 +270,6 @@ public:
         if (!root_) return;
 
         if (root_->data == data) {
-            // First node needs to be deleted
             const auto next = root_->next;
             delete root_;
             --size_;
@@ -287,6 +286,34 @@ public:
                 break;
             }
         }
+    }
+
+    void remove_all(const_reference data) {
+        if (!root_) return;
+
+        node_pointer prev{nullptr};
+        auto current = root_;;
+
+        while (current) {
+            if (current->data == data) {
+                const auto next = current->next;
+
+                delete current;
+                --size_;
+
+                if (!prev) {
+                    root_ = next;
+                } else {
+                    prev->next = next;
+                }
+                current = next;
+                continue;
+            }
+
+            prev    = current;
+            current = current->next;
+        }
+
     }
 };
 

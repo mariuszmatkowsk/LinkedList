@@ -4,6 +4,7 @@
 
 #include <utility>
 #include <format>
+#include <string>
 
 TEST(LinkedList, canCreateEmptyLinkedList) {
     LinkedList<int> ll{};
@@ -515,5 +516,35 @@ TEST(LinkdeList, removeRemovesOnlyFirstOccurrence) {
     EXPECT_EQ(ll.front(), 2);
     ll.pop_front();
     EXPECT_EQ(ll.front(), 3);
+}
+
+TEST(LinkedList, removeAllDoNothingWhenListEmpty) {
+    LinkedList<std::string> ll{};
+
+    using namespace std::string_literals;
+    ll.remove_all("Foo"s);
+
+    EXPECT_TRUE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 0);
+}
+
+TEST(LinkdeList, removeAll) {
+    LinkedList<int> ll{1, 3, 1, 4, 1};
+
+    ll.remove_all(1);
+
+    EXPECT_EQ(ll.size(), 2);
+    EXPECT_EQ(ll.front(), 3);
+    ll.pop_front();
+    EXPECT_EQ(ll.front(), 4);
+}
+
+TEST(LinkedList, removeAllWhenListHasSameElements) {
+    LinkedList<int> ll{1, 1, 1};
+
+    ll.remove_all(1);
+
+    EXPECT_TRUE(ll.is_empty());
+    EXPECT_EQ(ll.size(), 0);
 }
 
